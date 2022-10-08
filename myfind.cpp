@@ -2,9 +2,35 @@
 #include <unistd.h>
 #include <assert.h>
 #include <vector>
+#include <string.h>
 #include "Searchobject.h"
 
-//TODO: rausfinden wie das mit den extra argumenten funktioniert (optarg)
+//help function
+void print_usage(){
+    std::cout << " Usage: ./myfind [-R] [-i] searchpath filename1 [filename2] ...[filenameN]\n to search in current directory enter ./ as searchpath" << std::endl;
+}
+
+//TODO: einen Weg finden, dass egal is wo -R und -i gesetzt ist
+//extracting data from arguments 
+void extractData(Searchobject* search, int argc, char *argv[]){
+    int flags = 0;  //determines if -R or -i was set
+
+    if (search->getR() && search->getI()){
+        if(strcmp(argv[1], "-Ri"))              //checks if flags were set as -Ri or as -R -i
+            flags = 2;                       
+        else 
+            flags = 1;
+    }
+
+    else if (search->getR() || search->getI())
+        flags = 1;
+
+
+    search->setSearchpath(argv[flags + 1]);    //searchpath is next to flags in array
+    for (int i = 2 + flags; i < argc; i++) {   //files to look for are next to searchpath
+        search->addfiles(argv[i]);
+    }
+}
 
 
 /* Entry Point */
@@ -13,21 +39,24 @@ int main(int argc, char *argv[])
     int c;
     Searchobject *search = new Searchobject();
 
-    while ((c = getopt(argc, argv, "Ri")) != EOF)
+    while ((c = getopt(argc, argv, "Rih")) != EOF)
     {
         switch (c)
         {
         case '?':
-            std::cerr << "Error Unknown option";
+            std::cerr << "Error Unknown option\nUse ./myfind -h for help";
             exit(1);
-            break;
+
+        case 'h':
+            print_usage();
+            exit(1);
 
         case 'R':
             search->setR();
             break;
 
         case 'i':
-            search->getI();
+            search->setI();
             break;
 
         default:
@@ -35,22 +64,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    //Todo: logik für wenn -R oder oder -i eingegeben wird
-    if ((search->getR() < 1) || (search->getI() < 1))
-    {
-        std::string test = "test";
-        search->setSearchpath(argv[1]);
-        for(int i = 2; i < argc; i++)
-            search->addfiles(argv[i]);
-    }
+    extractData(search, argc, argv);
 
-    /* if ( optind >= argc ) {
-        fprintf(stderr, "Fehler: Es wurden Optionen, die Argumente erwarten, ohne Argument angegeben.\n");
-        exit(EXIT_FAILURE);
-    } */
-
-    std::cout << argc << " arguments were given." << std::endl << "Path: " << search->getSearchpath()<< std::endl << "Looking for files: ";
-    search->printFiles();
+    std::cout << optind << " arguments were given." << std::endl << "Path: " << search->getSearchpath()<< std::endl << "Looking for files: ";
+    search->printFiles(); 
+    if (search->searchFiles(search->getFilenames()[0]))
+        std::cout << "File found in this directory!"<< std::endl;
+    else
+        std::cout << "File not found in this directory!" << std::endl;
 
     return 0;
 }

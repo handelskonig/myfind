@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <string>
+#include <string.h>
+#include <filesystem>
 
 class Searchobject{
     private:
@@ -20,5 +21,6 @@ class Searchobject{
         void setI();
         unsigned short getI();
         void printFiles();
+        int searchFiles(std::string filename);
 };
 
