@@ -11,10 +11,7 @@
 int main(int argc, char *argv[])
 {
     int c;
-    std::string searchpath;
-    std::vector<std::string> filenames;
-    unsigned short Counter_R = 0;
-    unsigned short Counter_i = 0;
+    Searchobject *search = new Searchobject();
 
     while ((c = getopt(argc, argv, "Ri")) != EOF)
     {
@@ -26,22 +23,25 @@ int main(int argc, char *argv[])
             break;
 
         case 'R':
-            Counter_R++;
+            search->setR();
             break;
 
         case 'i':
-            Counter_i++;
+            search->getI();
             break;
 
         default:
             assert(0);
         }
     }
-    if ((Counter_R < 1) || (Counter_i < 1))
+
+    //Todo: logik für wenn -R oder oder -i eingegeben wird
+    if ((search->getR() < 1) || (search->getI() < 1))
     {
-        searchpath = argv[1];
+        std::string test = "test";
+        search->setSearchpath(argv[1]);
         for(int i = 2; i < argc; i++)
-            filenames.push_back(argv[i]);
+            search->addfiles(argv[i]);
     }
 
     /* if ( optind >= argc ) {
@@ -49,9 +49,8 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     } */
 
-    std::cout << argc << " arguments were given." << std::endl << "Path: " << searchpath << std::endl << "Looking for files: ";
-    for (auto &file : filenames)
-        std::cout << file << " ";    
+    std::cout << argc << " arguments were given." << std::endl << "Path: " << search->getSearchpath()<< std::endl << "Looking for files: ";
+    search->printFiles();
 
     return 0;
 }
