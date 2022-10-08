@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <assert.h>
+#include <vector>
 
 //TODO: rausfinden wie das mit den extra argumenten funktioniert (optarg)
 
@@ -9,14 +10,12 @@
 int main(int argc, char *argv[])
 {
     int c;
-    //char *dateiname;
-    //char *programm_name;
+    std::string searchpath;
+    std::vector<std::string> filenames;
     unsigned short Counter_R = 0;
     unsigned short Counter_i = 0;
 
-    //programm_name = argv[0];
-
-    while ((c = getopt(argc, argv, "Ri:")) != EOF)
+    while ((c = getopt(argc, argv, "Ri")) != EOF)
     {
         switch (c)
         {
@@ -27,10 +26,9 @@ int main(int argc, char *argv[])
 
         case 'R':
             Counter_R++;
-            //dateiname = optarg;
             break;
 
-        case 'v':
+        case 'i':
             Counter_i++;
             break;
 
@@ -38,20 +36,11 @@ int main(int argc, char *argv[])
             assert(0);
         }
     }
-    if ((Counter_R > 1) || (Counter_i > 1))
+    if ((Counter_R < 1) || (Counter_i < 1))
     {
-        std::cerr << "Too many arguments!";
-        exit(1);
-    }
-
-    if (optind < argc)
-    {
-        printf("ARGV Elemente ohne Optionen: ");
-        while (optind < argc)
-        {
-            printf("%s ", argv[optind++]);
-        }
-        printf("\n");
+        searchpath = argv[1];
+        for(int i = 2; i < argc; i++)
+            filenames.push_back(argv[i]);
     }
 
     /* if ( optind >= argc ) {
@@ -59,42 +48,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     } */
 
-    std::cout << argc << " arguments were given." << std::endl;
+    std::cout << argc << " arguments were given." << std::endl << "Path: " << searchpath << std::endl << "Looking for files: ";
+    for (auto &file : filenames)
+        std::cout << file << " ";    
 
-
-    if (Counter_R > 0){
-        std::cout << "looking for " << ; 
-    }
-
-/*int main(int argc, char *argv[]){
-    
-    int c;
-    char* program_name = optarg;
-    int counter_R = 0;
-    int counter_i = 0;
-    //program_name = argv[0];
-
-
-
-    while ((c = getopt(argc, argv, "Ri:")) != EOF){
-        switch (c){
-        
-        case '?':
-            fprintf(stderr, "Error: Unknown option.\n");
-            exit(1);
-            break;
-
-        case 'R':
-            counter_R++;
-            exit(0);
-            break;
-
-        case 'i':
-            counter_i++;
-            exit(0);
-            break;
-        }
-    }*/
-    
     return 0;
 }
+
