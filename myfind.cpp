@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <vector>
+#include "Searchobject.h"
 
 //TODO: rausfinden wie das mit den extra argumenten funktioniert (optarg)
 
