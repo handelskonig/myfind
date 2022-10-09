@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 #include <filesystem>
+#include <dirent.h>
 
 class Searchobject{
     private:

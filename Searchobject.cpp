@@ -54,14 +54,22 @@ void Searchobject::printFiles(){
 
 //TODO: einen weg finden die files mit dem suchparameter zu vergleichen
 int Searchobject::searchFiles(std::string filename){
-    std::string file = "\"" + this->searchpath + filename + "\"";
-    std::cout << "filename" << file;
+    if (this->searchpath == "./")                               // if ./ was given as path, use current path
+        this->searchpath = std::filesystem::current_path(); 
+
+    if (this->searchpath.back() != '/')
+        this->searchpath = this->searchpath + "/";
+
+    std::string file_w_path = this->searchpath + filename;
+
+    std::cout << "filename " << file_w_path << std::endl;
     for (const auto & file : std::filesystem::directory_iterator(this->getSearchpath())){
-        std::cout << file << std::endl;
-        if (strcmp(file, filename)){
-            std::cout <<"Test";
+        std::cout << std::filesystem::absolute(file.path()) << std::endl;;
+        if (file_w_path == file.path().string()){
+            std::cout << "\033[1;92mSuccess file was found under" << std::filesystem::absolute(file.path()) << "\033[0m" << std::endl;
             return 1;
         }
     }
+
     return 0;
 }

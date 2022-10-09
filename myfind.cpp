@@ -7,7 +7,7 @@
 
 //help function
 void print_usage(){
-    std::cout << " Usage: ./myfind [-R] [-i] searchpath filename1 [filename2] ...[filenameN]\n to search in current directory enter ./ as searchpath" << std::endl;
+    std::cout << " Usage: ./myfind [-R] [-i] searchpath filename1 [filename2] ...[filenameN]\nTo search in current directory enter ./ as searchpath\n Path has to end with /" << std::endl;
 }
 
 //TODO: einen Weg finden, dass egal is wo -R und -i gesetzt ist
@@ -68,10 +68,8 @@ int main(int argc, char *argv[])
 
     std::cout << optind << " arguments were given." << std::endl << "Path: " << search->getSearchpath()<< std::endl << "Looking for files: ";
     search->printFiles(); 
-    if (search->searchFiles(search->getFilenames()[0]))
-        std::cout << "File found in this directory!"<< std::endl;
-    else
-        std::cout << "File not found in this directory!" << std::endl;
+    if (!search->searchFiles(search->getFilenames()[0]))
+        std::cout << "\033[1;31mError: " << search->getFilenames()[0] << " was not found in " << search->getSearchpath() << "\033[0m" << std::endl;
 
     return 0;
 }
