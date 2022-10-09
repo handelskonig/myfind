@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <string.h>
+#include <string>
 #include <filesystem>
-#include <dirent.h>
+#include <algorithm>
+
 
 class Searchobject{
     private:
@@ -22,6 +23,7 @@ class Searchobject{
         void setI();
         unsigned short getI();
         void printFiles();
-        int searchFiles(std::string filename);
+        bool searchFiles(std::string filename);
+        bool iterateDirectory(std::string file_w_path, std::filesystem::path searchpath, std::string filename);
 };
 
