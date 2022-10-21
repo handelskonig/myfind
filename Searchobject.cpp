@@ -6,6 +6,9 @@ Searchobject::Searchobject(){
     Counter_i = 0;
 }
 
+Searchobject::~Searchobject(){
+}
+
 std::string Searchobject::getSearchpath(){
     return this->searchpath;
 }
@@ -54,20 +57,10 @@ void Searchobject::printFiles(){
 }
 
 bool Searchobject::iterateDirectory(std::string file_w_path, std::filesystem::path searchpath, std::string filename){
-
-
-    for (const auto & file : std::filesystem::directory_iterator(searchpath)){  //iterating over files
+    
+   for (const auto & file : std::filesystem::recursive_directory_iterator(searchpath)){  //iterating over files
 
         std::string temp = file.path().string();  //temp variable turning filepath to string for convinience
-
-        if(this->getR()){
-            if(std::filesystem::is_directory(file.path())){  //check to see if file is a directory
-                this->searchpath = file.path();    //searchpath is being changed to subdirectory path
-                std::cout << "Looking in: " << file.path() << std::endl;    
-                if(searchFiles(filename))     // the searchfiles funct is called again to create new file_with path and do search again in subdirectory
-                    return true;
-            }
-        }
 
         if(getI()){                  // if -i flag is set turn the whole path to lowercase letters
             std::for_each(temp.begin(), temp.end(), [](char & c) {
@@ -75,8 +68,20 @@ bool Searchobject::iterateDirectory(std::string file_w_path, std::filesystem::pa
             });
         }
 
+        if(this->getR()){
+            if(std::filesystem::is_directory(file.path())){  //check to see if file is a directory
+    
+                this->searchpath = file.path();    //searchpath is being changed to subdirectory path
+                if(searchFiles(filename)){     // the searchfiles funct is called again to create new file_with path and do search again in subdirectory
+                    if(file_w_path == temp)
+                        std::cout << "\033[1;92m" << getpid() << ": Success file was found under " << std::filesystem::absolute(file.path()) << "\033[0m" << std::endl;
+                    return true;
+                }
+            }           
+        }
+
         if (file_w_path == temp){   // comparing file to look for with every file in directory, returning 1 if successful
-            std::cout << "\033[1;92mSuccess file was found under" << std::filesystem::absolute(file.path()) << "\033[0m" << std::endl;
+            std::cout << "\033[1;92m" << getpid() << ": Success file was found under " << std::filesystem::absolute(file.path()) << "\033[0m" << std::endl;
             return true;
         }
     }
@@ -86,7 +91,7 @@ bool Searchobject::iterateDirectory(std::string file_w_path, std::filesystem::pa
 bool Searchobject::searchFiles(std::string filename){
 
 
-    //#####TODO: relativer Pfad muss auch gehen######
+
     if (this->searchpath == "./")                               // if ./ was given as path, use current path
         this->searchpath = std::filesystem::current_path(); 
 
@@ -95,7 +100,7 @@ bool Searchobject::searchFiles(std::string filename){
 
     std::string file_w_path = this->searchpath + filename; //adding searchpath to filename 
     
-    //###TODO: pfad muss auch case insensitive angegeben werden können####
+
     if(this->getI()){  //if -i flag is set turn the file with whole path string to all lowercase
         std::for_each(file_w_path.begin(), file_w_path.end(), [](char & c) {
             c = ::tolower(c);
@@ -103,9 +108,9 @@ bool Searchobject::searchFiles(std::string filename){
     }    
 
     std::filesystem::path searchpath(this->searchpath); //creating a searchpath object
-    if(iterateDirectory(file_w_path, searchpath, filename))       //iterating current directory using filename and searchpath
+    if (this->iterateDirectory(file_w_path, searchpath, filename))
         return true;
-    else
+    else 
         return false;
 }
 
